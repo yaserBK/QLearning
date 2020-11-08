@@ -8,7 +8,7 @@ import random
 
 
 class Agent:
-    debug = False
+    debug = True
 
     # init method
     def __init__(self, name, alpha, gamma, epsilon, num_actions, action_labels):
@@ -18,7 +18,6 @@ class Agent:
         self.epsilon = epsilon  # probability of random action/exploration
         self.num_actions = num_actions  # the number of available actions in the environment
         self.action_labels = action_labels  # labels/names of all available actions
-        # initialises q_values
         self.q_table = np.zeros((1, num_actions))  # can be modified later for problems with multiple states.
 
     # method to return 1 for cooperate and 2 for defect
@@ -31,10 +30,10 @@ class Agent:
         if random_value < self.epsilon:
             selected_action = self.select_random_action()
             if self.debug:
-                print("Agent", self.name, ": selected action", selected_action, "at random")
+                print("Agent", self.name, ": selected action", self.action_labels[selected_action], "at random")
         else:
             selected_action = self.get_max_valued_action()
-            print("Agent", self.name, ": selected action", selected_action, "greedily")
+            print("Agent", self.name, ": selected action", self.action_labels[selected_action], "greedily")
         return selected_action
 
     # function to return a random action
@@ -61,7 +60,7 @@ class Agent:
         return self.q_table[0, index]
 
     def update_q_value(self, selected_action, reward):
-        old_Q = self.q_table[0, selected_action]
+        old_q = self.q_table[0, selected_action]
         max_q = self.get_max_q_value()
-        new_q = float(old_Q + self.alpha * (reward + self.gamma * max_q - old_Q))
+        new_q = float(old_q + self.alpha * (reward + self.gamma * max_q - old_q))
         self.q_table[0, selected_action] = new_q
