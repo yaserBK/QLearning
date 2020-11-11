@@ -1,10 +1,10 @@
 from Agent import Agent
 import numpy as np
 
-debug = True
+debug = False
 
 
-class Game:
+class GameRunner:
     # Payoff values for the prisoners dilemma
     #              AgB
     #           C       D
@@ -16,13 +16,15 @@ class Game:
     pd_a_labels = np.array(["D", "C"])
     pd_actions = np.array([0, 1])
     num_episodes = 1000
+    alpha_decay_rate = 0.9
+    epsilon_decay_rate = 0.9
 
     # init for prisoners dilemma specifically
-    def __init__(self):
+    def __init__(self, agent_a, agent_b):
         # constructor takes in two agents that are meant to be instantiated in the "main"
         # agent constructor takes: agent name, alpha, gamma, epsilon, num_actions, action_labels.
-        self.agent_a = Agent("A")
-        self.agent_b = Agent("B")
+        self.agent_a = agent_a
+        self.agent_b = agent_b
 
     # after a round is played each players payoff will be used to update their respective q_tables.
     # this function can be copied and modified for other games
@@ -46,10 +48,10 @@ class Game:
         # a cooperates, b defects:
         elif action_a == 1 and action_b == 0:
             payoff_a = 0
-            payoff_b = 3
+            payoff_b = 5
         # a defects, b cooperates:
         elif action_a == 0 and action_b == 1:
-            payoff_a = 3
+            payoff_a = 5
             payoff_b = 0
 
         # payoff_a, payoff_b = payoff

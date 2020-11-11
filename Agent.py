@@ -8,17 +8,29 @@ import random
 
 
 class Agent:
-    debug = True
-    alpha = float(0.1)
-    gamma = 0.5
+    alpha = 0.1
+    gamma = 0.9
     epsilon = 0.1
     # 0 == defect, 1 == cooperate
-    action_labels = ["D", "C"]
+    action_labels = ["DEFECT", "COOPERATE"]
     num_actions = 2
 
+    # setter functions.
+    def set_alpha(self, alpha):
+        self.alpha = alpha
+
+    def set_gamma(self, gamma):
+        self.gamma = gamma
+
+    def set_epsilon(self, epsilon):
+        self.epsilon = epsilon
+
     # init method
-    def __init__(self, name):
+    def __init__(self, name, debug=False):
         self.name = name
+        self.debug = debug
+        #self.action_labels = action_labels
+        #self.num_actions = num_actions
         self.q_table = np.zeros((1, self.num_actions))  # can be modified later for problems with multiple states.
 
     # method to return 1 for cooperate and 2 for defect
