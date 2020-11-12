@@ -14,6 +14,7 @@ class Agent:
     # 0 == defect, 1 == cooperate
     action_labels = ["DEFECT", "COOPERATE"]
     num_actions = 2
+    random_or_greedy = "random"  # notes whether a move was randomly selected or selected greedily
 
     # setter functions.
     def set_alpha(self, alpha):
@@ -29,8 +30,8 @@ class Agent:
     def __init__(self, name, debug=False):
         self.name = name
         self.debug = debug
-        #self.action_labels = action_labels
-        #self.num_actions = num_actions
+        # self.action_labels = action_labels
+        # self.num_actions = num_actions
         self.q_table = np.zeros((1, self.num_actions))  # can be modified later for problems with multiple states.
 
     # method to return 1 for cooperate and 2 for defect
@@ -41,10 +42,12 @@ class Agent:
             print("Agent", self.name, ": selecting action, epsilon =", self.epsilon, "random Value =", random_value)
 
         if random_value < self.epsilon:
+            self.selected_at_random = "random"
             selected_action = self.select_random_action()
             if self.debug:
                 print("Agent", self.name, ": selected action", self.action_labels[selected_action], "at random")
         else:
+            self.selected_at_random = "greedy"
             selected_action = self.get_max_valued_action()
             print("Agent", self.name, ": selected action", self.action_labels[selected_action], "greedily")
         return selected_action
@@ -73,7 +76,7 @@ class Agent:
         elif self.q_table[0, 0] < self.q_table[0, 1]:
             return 1
         else:
-            return int(random.random()*self.num_actions)
+            return int(random.random() * self.num_actions)
 
     def enable_debugging(self):
         self.debug = True

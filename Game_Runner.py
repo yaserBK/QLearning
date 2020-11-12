@@ -1,10 +1,19 @@
 from Agent import Agent
 import numpy as np
+import csv
 
 debug = False
 
 
 class GameRunner:
+    round_count = 0
+    # stores round data to write to csv
+    agent_a_payoffs = []
+    agent_b_payoffs = []
+    agent_a_action = []
+    agent_b_action = []
+    agent_a_rand = [] # yes, no
+    agent_b_rand = [] # yes, no
     # Payoff values for the prisoners dilemma
     #              AgB
     #           C       D
@@ -25,6 +34,11 @@ class GameRunner:
         # agent constructor takes: agent name, alpha, gamma, epsilon, num_actions, action_labels.
         self.agent_a = agent_a
         self.agent_b = agent_b
+        # to write to csv
+        with open("agent_a.csv", 'w', newline='') as f:
+            self.the_writer_a = csv.writer(f)
+        with open("agent_b.csv", 'w', newline='') as g:
+            self.the_writer_b = csv.writer(g)
 
     # after a round is played each players payoff will be used to update their respective q_tables.
     # this function can be copied and modified for other games
@@ -54,6 +68,9 @@ class GameRunner:
             payoff_a = 5
             payoff_b = 0
 
+        with open("agent_a.csv", 'w', newline='') as f:
+            self.the_writer_a = csv.writer(f)
+            self.the_writer_a.writerow([payoff_a])
         # payoff_a, payoff_b = payoff
         self.agent_a.update_q_value(action_a, payoff_a)
         print("Payoff A: ", payoff_a)
@@ -61,4 +78,4 @@ class GameRunner:
         self.agent_b.update_q_value(action_b, payoff_b)
         print("Payoff B: ", payoff_b)
         print(self.agent_b.q_table)
-
+        self.round_count += 1
