@@ -1,4 +1,5 @@
 from Agent import Agent
+
 import numpy as np
 import csv
 
@@ -6,27 +7,31 @@ debug = False
 
 
 class GameRunner:
-    round_count = 0
-    # stores round data to write to csv
+    num_episodes = 1000
+    round_count = 0  # incremented at end of round
+    # payoff at end of each round:
     agent_a_payoffs = []
     agent_b_payoffs = []
+    # action selected by agent:
     agent_a_action = []
     agent_b_action = []
-    agent_a_rand = [] # yes, no
-    agent_b_rand = [] # yes, no
-    # Payoff values for the prisoners dilemma
+    # greedy or at random?:
+    agent_a_rg = []
+    agent_b_rg = []
+
+    # Payoff table for the prisoners dilemma:
+
     #              AgB
     #           C       D
     #       C [3,3]   [0,5]
     #  AgA
     #       D [5,0]   [0,0]
 
-    pd_payoffs = np.array([(3, 3), (0, 5), (5, 0), (0, 0)])
-    pd_a_labels = np.array(["D", "C"])
-    pd_actions = np.array([0, 1])
-    num_episodes = 1000
-    alpha_decay_rate = 0.9
-    epsilon_decay_rate = 0.9
+    # pd_payoffs = np.array([(3, 3), (0, 5), (5, 0), (0, 0)])
+    # pd_a_labels = np.array(["D", "C"])
+    # pd_actions = np.array([0, 1])
+    # alpha_decay_rate = 0.9
+    # epsilon_decay_rate = 0.9
 
     # init for prisoners dilemma specifically
     def __init__(self, agent_a, agent_b):
@@ -34,15 +39,11 @@ class GameRunner:
         # agent constructor takes: agent name, alpha, gamma, epsilon, num_actions, action_labels.
         self.agent_a = agent_a
         self.agent_b = agent_b
-        # to write to csv
-        with open("agent_a.csv", 'w', newline='') as f:
-            self.the_writer_a = csv.writer(f)
-        with open("agent_b.csv", 'w', newline='') as g:
-            self.the_writer_b = csv.writer(g)
 
     # after a round is played each players payoff will be used to update their respective q_tables.
     # this function can be copied and modified for other games
     def pd_play_round(self):
+        self.round_count += 1
         # each agent chooses an action at the start of round
         payoff = None
         action_a = self.agent_a.select_action()
@@ -68,14 +69,23 @@ class GameRunner:
             payoff_a = 5
             payoff_b = 0
 
-        with open("agent_a.csv", 'w', newline='') as f:
-            self.the_writer_a = csv.writer(f)
-            self.the_writer_a.writerow([payoff_a])
-        # payoff_a, payoff_b = payoff
         self.agent_a.update_q_value(action_a, payoff_a)
+        rg_a = self.agent_a.rg
+
         print("Payoff A: ", payoff_a)
         print(self.agent_a.q_table)
         self.agent_b.update_q_value(action_b, payoff_b)
         print("Payoff B: ", payoff_b)
         print(self.agent_b.q_table)
-        self.round_count += 1
+        print("ROUND CONT ", self.round_count)
+        self.store_round(action_a, action_b, payoff_a, payoff_b, self.agent_a.rg, self.agent_b.rg)
+
+    def store_round(self, action_a, payoff_a, action_b, payoff_b, rg_a, rg_b):
+        self.agent_a_action.append(action_a)
+        self.agent_b_action.append(action_b)
+
+        self.agent_a_payoffs.append(payoff_a)
+        self.agent_b_payoffs.append(payoff_b)
+
+        self.agent_a_rg.append(rg_a)
+        self.agent_b_rg.append(rg_b)

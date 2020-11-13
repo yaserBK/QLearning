@@ -14,9 +14,16 @@ class Agent:
     # 0 == defect, 1 == cooperate
     action_labels = ["DEFECT", "COOPERATE"]
     num_actions = 2
-    random_or_greedy = "random"  # notes whether a move was randomly selected or selected greedily
 
-    # setter functions.
+    # init method
+    def __init__(self, name, debug=False):
+        self.name = name
+        self.debug = debug
+        self.rg = "random"  # notes whether a move was randomly selected or selected greedily
+        # self.action_labels = action_labels
+        # self.num_actions = num_actions
+        self.q_table = np.zeros((1, self.num_actions))  # can be modified later for problems with multiple states.
+
     def set_alpha(self, alpha):
         self.alpha = alpha
 
@@ -26,32 +33,6 @@ class Agent:
     def set_epsilon(self, epsilon):
         self.epsilon = epsilon
 
-    # init method
-    def __init__(self, name, debug=False):
-        self.name = name
-        self.debug = debug
-        # self.action_labels = action_labels
-        # self.num_actions = num_actions
-        self.q_table = np.zeros((1, self.num_actions))  # can be modified later for problems with multiple states.
-
-    # method to return 1 for cooperate and 2 for defect
-    def ol_select_action(self):
-        # selected_action = None  # declaring variable to be returned later
-        random_value = random.random()
-        if self.debug:
-            print("Agent", self.name, ": selecting action, epsilon =", self.epsilon, "random Value =", random_value)
-
-        if random_value < self.epsilon:
-            self.selected_at_random = "random"
-            selected_action = self.select_random_action()
-            if self.debug:
-                print("Agent", self.name, ": selected action", self.action_labels[selected_action], "at random")
-        else:
-            self.selected_at_random = "greedy"
-            selected_action = self.get_max_valued_action()
-            print("Agent", self.name, ": selected action", self.action_labels[selected_action], "greedily")
-        return selected_action
-
     def select_action(self):
         random_value = random.random()
         if self.debug:
@@ -59,14 +40,14 @@ class Agent:
 
         if random_value < self.epsilon:
             selected_action = self.select_random_action()
+            self.rg = "random"
             print("Agent", self.name, ": selected action", self.action_labels[selected_action], "at random")
         else:
             selected_action = self.get_max_valued_action()
+            self.rg = "greedy"
             print("Agent", self.name, ": selected action", self.action_labels[selected_action], "greedily")
         return selected_action
 
-    # function to return a random action
-    # called in the select_action() function
     def select_random_action(self):
         return int(random.random() * self.num_actions)
 
@@ -81,7 +62,6 @@ class Agent:
     def enable_debugging(self):
         self.debug = True
 
-    # function used in update_q_value()
     def get_max_q_value(self):
         index = self.get_max_valued_action()
         return self.q_table[0, index]
