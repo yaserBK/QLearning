@@ -21,8 +21,6 @@ debug = False
 # -> (agent_a, agent_b) whether actions made at random or greedily
 
 
-
-
 class GameRunner:
     num_episodes = 1000
     round_count = 0  # incremented at end of round

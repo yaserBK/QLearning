@@ -2,9 +2,9 @@ import numpy as np
 import random
 
 
-# all the functions in the Agent class are designed around
-# the problem (prisoners dilemma) being stateless
-# a few functions will need tweaking for problems with states.
+# QLearning agent built around stateless problems
+
+# todo: add alpha and epsilon decay
 
 
 class Agent:
@@ -71,4 +71,8 @@ class Agent:
         max_q = self.get_max_q_value()
         new_q = old_q + self.alpha * (reward + self.gamma * max_q - old_q)
         self.q_table[0, selected_action] = new_q
-d
+
+    def decay_alpha(self):
+        self.alpha *= 0.999
+
+
