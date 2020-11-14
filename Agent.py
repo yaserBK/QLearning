@@ -71,3 +71,4 @@ class Agent:
         max_q = self.get_max_q_value()
         new_q = old_q + self.alpha * (reward + self.gamma * max_q - old_q)
         self.q_table[0, selected_action] = new_q
+d
