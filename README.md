@@ -7,3 +7,4 @@ At the moment, the Agents use Q-learning, with exploration:exploitation balanced
 
 In the next iteration, I intend to have exploration determined by _soft-max_
 
+The purpose of this is to constantly train agents and pit them against one another until they come upon a nash-equilibrium. 
