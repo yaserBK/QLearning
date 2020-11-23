@@ -1,10 +1,6 @@
-from Agent import Agent
-
 import numpy as np
-import csv
 
 debug = False
-
 
 # This class runs games
 # it takes in the following:
@@ -22,8 +18,7 @@ debug = False
 
 
 class GameRunner:
-    num_episodes = 1000
-    round_count = 0  # incremented at end of round
+    num_episodes = 10000
     # payoff at end of each round:
     agent_a_payoffs = []
     agent_b_payoffs = []
@@ -33,6 +28,27 @@ class GameRunner:
     # greedy or at random?:
     agent_a_rg = []
     agent_b_rg = []
+
+    round_count = 0  # incremented at end of round
+    # holds number of times 0 or 1 was chosen by agent a or b
+    a_one_count = 0
+    b_one_count = 0
+    a_zero_count = 0
+    b_zero_count = 0
+
+    # I might be storing too much redundant data, but it saves me the pain of having to work with pandas.
+    # Probabilities of actions over time t.
+    a_zero_prob = []
+    b_zero_prob = []
+
+    a_one_prob = []
+    b_one_prob = []
+
+    # were initially meant to number of times each agent selected.
+    # agent_a_one = []
+    # agent_a_zero = []
+    # agent_b_one = []
+    # agent_b_zero = []
 
     # payoff tables should be entered in the following format of payoffs
     # where X and Y are the moves available to agents a and b
@@ -62,16 +78,28 @@ class GameRunner:
         self.agent_b = agent_b
         self.payoff_table = np.array(payoff_table)
 
+    def play_episodes(self, num_episodes, decay_alpha_a=False, decay_alpha_b=False, decay_point_a=num_episodes/2, decay_point_b=num_episodes/2):
+        for i in range(num_episodes):
+            self.pd_play_round()
+
+            if i >= decay_point_a:
+                if decay_alpha_a is True:
+                    self.agent_a.decay_alpha()
+            if i >= decay_point_b:
+                if decay_alpha_b is True:
+                    self.agent_b.decay_alpha()
+
     # after a round is played each players payoff will be used to update their respective q_tables.
     # this function can be copied and modified for other games
     def pd_play_round(self):
-        self.round_count += 1
+        #self.round_count += 1
         # each agent chooses an action at the start of round
         payoff = None
         action_a = self.agent_a.select_action()
-        print("ACTION SELECTED IN GAME BY A: ", action_a)
         action_b = self.agent_b.select_action()
-        print("ACTION SELECTED IN GAME BY B: ", action_b)
+        if debug:
+            print("ACTION SELECTED IN GAME BY A: ", action_a)
+            print("ACTION SELECTED IN GAME BY B: ", action_b)
 
         # both cooperate
         payoff_a = 0
@@ -92,23 +120,44 @@ class GameRunner:
             payoff_b = self.payoff_table[3, 1]
 
         self.agent_a.update_q_value(action_a, payoff_a)
-        rg_a = self.agent_a.rg
-
-        print("Payoff A: ", payoff_a)
-        print(self.agent_a.q_table)
         self.agent_b.update_q_value(action_b, payoff_b)
-        print("Payoff B: ", payoff_b)
-        print(self.agent_b.q_table)
-        print("ROUND CONT ", self.round_count)
+
+        if debug:
+            print("Payoff A: ", payoff_a)
+            print(self.agent_a.q_table)
+            print("Payoff B: ", payoff_b)
+            print(self.agent_b.q_table)
+            print("ROUND CONT ", self.round_count)
+
+        self.round_count += 1
+
         self.store_round(action_a=action_a, payoff_a=payoff_a, action_b=action_b, payoff_b=payoff_b,
                          rg_a=self.agent_a.rg, rg_b=self.agent_b.rg)
 
     def store_round(self, action_a, payoff_a, action_b, payoff_b, rg_a, rg_b):
+
         self.agent_a_action.append(action_a)
         self.agent_b_action.append(action_b)
 
         self.agent_a_payoffs.append(payoff_a)
         self.agent_b_payoffs.append(payoff_b)
+
+
+        if action_a == 0:
+            self.a_zero_count += 1
+        elif action_a == 1:
+            self.a_one_count += 1
+
+        self.a_one_prob.append(round(self.a_one_count/self.round_count, 2))
+        self.a_zero_prob.append(round((self.round_count - self.a_one_count)/self.round_count, 2))
+
+        if action_b == 0:
+            self.b_zero_count += 1
+        else:
+            self.b_one_count += 1
+
+        self.b_one_prob.append(round((self.round_count-self.b_zero_count) / self.round_count, 2))
+        self.b_zero_prob.append(round(self.b_zero_count / self.round_count, 2))
 
         self.agent_a_rg.append(rg_a)
         self.agent_b_rg.append(rg_b)

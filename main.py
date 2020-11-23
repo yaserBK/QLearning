@@ -8,9 +8,8 @@ chicken_pt = [
     # d,s    d,d
     [7, 2], [0, 0]
 ]
-agent_a = Agent(name="A", debug=True)
-agent_b = Agent(name="B", debug=True)
-pd_payoff_table = [
+
+prisoners_dilemma_pt = [
     # c,c    c,d
     [3, 3], [0, 5],
     # d,c    d,d
@@ -19,13 +18,25 @@ pd_payoff_table = [
 
 if __name__ == '__main__':
 
-    prisoners_dilemma = GameRunner(agent_a=agent_a, agent_b=agent_b, payoff_table=pd_payoff_table)
-    util = Util(prisoners_dilemma)
-    for i in range(1000):
-        print("")
-        print("--------------------- Iteration", i, "-----------------------")
-        prisoners_dilemma.pd_play_round()
+    agent_a = Agent(name="A", debug=False)
+    agent_b = Agent(name="B", debug=False)
+
+    game1 = GameRunner(agent_a=agent_a, agent_b=agent_b, payoff_table=chicken_pt)
+
+    util = Util(game1)
+
+    # iterations = 20000
+    # for i in range(iterations):
+    #     print("")
+    #     print("--------------------- Iteration", i+1, "of", iterations, "-----------------------")
+    #
+    #     prisoners_dilemma.pd_play_round()
+
+    game1.play_episodes(10000, decay_alpha_a=False, decay_alpha_b=False)
+
+
 
     print("Writing data to csv")
-    util.write_to_csv()
+    #util.write_both_to_csv()
+    util.write_choices_to_csv()
     print("Data successfully written to csv")

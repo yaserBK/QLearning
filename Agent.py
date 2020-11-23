@@ -12,7 +12,7 @@ class Agent:
     gamma = 0.9
     epsilon = 0.1
     # 0 == defect, 1 == cooperate
-    action_labels = ["DEFECT", "COOPERATE"]
+    action_labels = ["0", "1"]  # defect, cooperate or Y, X
     num_actions = 2
 
     # init method
@@ -41,11 +41,13 @@ class Agent:
         if random_value < self.epsilon:
             selected_action = self.select_random_action()
             self.rg = "random"
-            print("Agent", self.name, ": selected action", self.action_labels[selected_action], "at random")
+            if self.debug:
+                print("Agent", self.name, ": selected action", self.action_labels[selected_action], "at random")
         else:
             selected_action = self.get_max_valued_action()
             self.rg = "greedy"
-            print("Agent", self.name, ": selected action", self.action_labels[selected_action], "greedily")
+            if self.debug:
+                print("Agent", self.name, ": selected action", self.action_labels[selected_action], "greedily")
         return selected_action
 
     def select_random_action(self):
