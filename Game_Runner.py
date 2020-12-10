@@ -95,8 +95,8 @@ class GameRunner:
         #self.round_count += 1
         # each agent chooses an action at the start of round
         payoff = None
-        action_a = self.agent_a.select_action()
-        action_b = self.agent_b.select_action()
+        action_a = self.agent_a.select_action(sm=True)
+        action_b = self.agent_b.select_action(sm=True)
         if debug:
             print("ACTION SELECTED IN GAME BY A: ", action_a)
             print("ACTION SELECTED IN GAME BY B: ", action_b)

@@ -7,6 +7,9 @@ import random
 # todo: add alpha and epsilon decay
 
 
+
+
+
 class Agent:
     alpha = 0.1
     gamma = 0.9
@@ -33,7 +36,16 @@ class Agent:
     def set_epsilon(self, epsilon):
         self.epsilon = epsilon
 
-    def select_action(self):
+    def select_action(self, sm=True):
+        if sm:
+            self.select_action_softmax()
+        else:
+            self.select_action_epsilon_greedy()
+
+
+
+
+    def select_action_epsilon_greedy(self):
         random_value = random.random()
         if self.debug:
             print("Agent", self.name, ": selecting action, epsilon =", self.epsilon, "random Value =", random_value)
@@ -43,6 +55,10 @@ class Agent:
             self.rg = "random"
             if self.debug:
                 print("Agent", self.name, ": selected action", self.action_labels[selected_action], "at random")
+                print("QTABLE: ")
+                print(self.q_table)
+                print("Softmax Values: ")
+                print(self.soft_max(self.q_table))
         else:
             selected_action = self.get_max_valued_action()
             self.rg = "greedy"
@@ -76,5 +92,37 @@ class Agent:
 
     def decay_alpha(self):
         self.alpha *= 0.999
+
+    def normalise_probabilities(self, q_table):
+        soft_qs = (np.exp(q_table.T) / np.sum(np.exp(q_table), axis=1)).T
+        return soft_qs
+
+    def select_action_softmax(self):
+        normalised_probabilities = self.normalise_probabilities(self.q_table)
+
+        trigger = random.random()  # lands on a specific point on the scale to determine which action to take
+
+        scale = []
+        total = 0  # used to define each marker in "bar"
+
+        for i in normalised_probabilities:
+            total += i
+            scale.append(total)  # adding each point to the "scale"
+
+        scale = np.array(scale)
+
+        if trigger <= scale[0,0]:
+            return 0
+
+        else:
+            for i in range(1, len(scale)-1):
+                if trigger <= scale[0,i]:
+                    return i
+
+
+
+
+
+
 
 
